@@ -15,6 +15,8 @@ function Categories() {
     const [bodyParts, setBodyParts] = useState([])
 
     const [target, setTarget] = useState([])
+
+    const [toggle, setToggle] = useState(false)
   
     useEffect(() => {
       const fetchExercisesData = async() => {
@@ -60,6 +62,11 @@ function Categories() {
       setExercises(categories)
     }
 
+    const handleTarget = async (trg) => {
+      const target = await fetchData(`https://exercisedb.p.rapidapi.com/exercises/target/${trg}`, exerciseOptions)
+      setExercises(target)
+    }
+
 
   return (
     <div className='container mx-auto flex justify-center items-center py-8 flex-col'>
@@ -73,23 +80,23 @@ function Categories() {
 
       <div className=''>
          <div className='flex gap-4 justify-center items-center'>
-          {bodyParts?.map((el, index) => {
+          {bodyParts ? bodyParts?.map((el, index) => {
             return(
-              <div onClick={() => handleCategory(el)} key={index} className='flex flex-col justify-center items-center border-2 w-32 text-[18px]'>
+              <div onClick={() => handleCategory(el)} key={index} className='cursor-pointer flex flex-col justify-center items-center border-2 w-32 text-[18px]'>
                 <img className='w-8 invert' src={teg} alt="teg" />
                 <p>{el}</p>
               </div>
             )
-          })}
+          }) : console.log('not working')}
          </div>
       </div>
 
-      <div className='mt-4 flex flex-col justify-center items-center'>
-        <p>More options</p>
-        <div className='flex gap-4 justify-center items-center flex-wrap'>
-          {target.map((target, index) => {
+      <div  className='mt-4 flex flex-col justify-center items-center'>
+        <p className='border-2 p-2 border-lime-500' onClick={() => setToggle(!toggle)}>More options</p>
+        <div className={ ` ${toggle ? 'flex' : 'hidden'} mt-4  flex gap-4 justify-center items-center flex-wrap`}>
+          {target?.map((target, index) => {
             return(
-              <div className='border-2 p-6 w-44 text-center justify-center items-center flex flex-col'>
+              <div onClick={() => handleTarget(target)} className='border-2 cursor-pointer p-4 w-44 text-center justify-center items-center flex flex-col'>
                   <img className='w-8 invert ' src={muscle} alt="" />
                   <p className='text-[16px] w-[300px]'>{target}</p>
               </div>
@@ -101,7 +108,7 @@ function Categories() {
 
       <div className='mt-12'>
           <div className='flex gap-4 flex-wrap items-center justify-center '>
-            {exercises.map((el, index) => {
+            {exercises?.map((el, index) => {
               return(
                 <ExeCard key={index} data={el}/>
               )

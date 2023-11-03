@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 function Navbar() {
   return (
-    <div className='container mx-auto flex justify-between items-center py-4'>
+    <div className='container mx-auto flex justify-between items-center py-4 '>
         <div>
             <p className='border-2 p-2'>Power | Gym</p>
         </div>
