@@ -1,18 +1,63 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import searchbar from '../../Assets/Search.png'
 
 import { exerciseOptions, fetchData } from '../../Utils/fetchData'
+import teg from '../../Assets/teg.png'
+import ExeCard from '../Exercises/ExeCard'
+import muscle from '../../Assets/muscle.png'
 
 function Categories() {
 
     const [search, setSearch] = useState('')
+    const [exercises, setExercises] = useState([])
+
+    const [bodyParts, setBodyParts] = useState([])
+
+    const [target, setTarget] = useState([])
+  
+    useEffect(() => {
+      const fetchExercisesData = async() => {
+        const bodyPartsData = await fetchData('https://exercisedb.p.rapidapi.com/exercises/bodyPartList', exerciseOptions)
+        setBodyParts(bodyPartsData)
+      }
+
+      fetchExercisesData()
+
+
+      const targetListData = async() => {
+        const targetData = await fetchData('https://exercisedb.p.rapidapi.com/exercises/targetList', exerciseOptions)
+        console.log(targetData)
+        setTarget(targetData)
+      }
+      targetListData()
+
+      const fetchDefaultData = async() => {
+        let data = await fetchData('https://exercisedb.p.rapidapi.com/exercises', exerciseOptions)
+        console.log(data)
+        setExercises(data)
+      }
+      fetchDefaultData()
+
+    }, [])
+    
 
     const handleSearch = async() => {
         if(search) {
             const exercisesData = await fetchData('https://exercisedb.p.rapidapi.com/exercises', exerciseOptions)
-            console.log(exercisesData)
+     
+            const searchedExercises = exercisesData.filter((exercise) => exercise.name.toLowerCase().includes(search) 
+            || exercise.equipment.toLowerCase().includes(search)
+            || exercise.target.toLowerCase().includes(search)
+            || exercise.bodyPart.toLowerCase().includes(search))
+            setSearch('')
+            setExercises(searchedExercises)
         }
+    }
+
+    const handleCategory = async(el) => {
+      const categories = await fetchData(`https://exercisedb.p.rapidapi.com/exercises/bodyPart/${el}`, exerciseOptions)
+      setExercises(categories)
     }
 
 
@@ -27,7 +72,41 @@ function Categories() {
         </div>
 
       <div className=''>
+         <div className='flex gap-4 justify-center items-center'>
+          {bodyParts?.map((el, index) => {
+            return(
+              <div onClick={() => handleCategory(el)} key={index} className='flex flex-col justify-center items-center border-2 w-32 text-[18px]'>
+                <img className='w-8 invert' src={teg} alt="teg" />
+                <p>{el}</p>
+              </div>
+            )
+          })}
+         </div>
+      </div>
+
+      <div className='mt-4 flex flex-col justify-center items-center'>
+        <p>More options</p>
+        <div className='flex gap-4 justify-center items-center flex-wrap'>
+          {target.map((target, index) => {
+            return(
+              <div className='border-2 p-6 w-44 text-center justify-center items-center flex flex-col'>
+                  <img className='w-8 invert ' src={muscle} alt="" />
+                  <p className='text-[16px] w-[300px]'>{target}</p>
+              </div>
          
+            )
+          })}
+        </div>
+      </div>
+
+      <div className='mt-12'>
+          <div className='flex gap-4 flex-wrap items-center justify-center '>
+            {exercises.map((el, index) => {
+              return(
+                <ExeCard key={index} data={el}/>
+              )
+            })}
+          </div>
       </div>
 
 
